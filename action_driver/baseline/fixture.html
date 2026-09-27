@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>ActionDriver Fork baseline</title></head>
+<body><h1>ActionDriver Fork baseline</h1>
+<button type="button" id="action">Click baseline</button>
+<label>Baseline input <input id="input" type="text"></label>
+<output id="result" aria-live="polite">ready</output>
+<script>document.querySelector('#action').addEventListener('click', () => { document.querySelector('#result').textContent = 'clicked'; });</script>
+</body></html>
