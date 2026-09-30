@@ -1,6 +1,6 @@
 # 双 Fork 基线验证
 
-本目录是 ActionDriver 自有测试代码；不扩展上游 Playwright 或 Chromium 行为，不接入 ActionDriver 产品。
+本目录是 Action-Driver 自有测试代码；不扩展上游 Playwright 或 Chromium 行为，不接入 Action-Driver 产品。
 
 ## 当前状态
 
@@ -22,22 +22,22 @@ Chromium 使用官方 GitHub 镜像传输同一提交；同步后已核验原始
 
 在 `thirdparty/playwright/` 运行 `npm ci`、`npm run build`，使用项目内 Node 的 session PATH。编译模块为 `packages/playwright-core/index.js`。
 
-Electron 在 `thirdparty/build/electron-workspace/` 执行锁定 revision 的 `gclient sync --no-history --revision src/electron@fbc489c43be82f0fc331560ae678a39aeaea38c8`。在 `src/` 生成 `out/ActionDriver`，配置为 `import("//electron/build/args/testing.gn") target_cpu="arm64" mac_sdk_path="/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk" enable_precompiled_headers=false`，实际使用同步的 `buildtools/mac/gn` 生成配置，使用 `third_party/ninja/ninja -C out/ActionDriver -j8 electron` 编译；depot_tools 包装脚本缺少 bootstrap Python 文件，未修改上游脚本。中间文件留在上游规定的位置，导出产物放 `thirdparty/build/`。
+Electron 在 `thirdparty/build/electron-workspace/` 执行锁定 revision 的 `gclient sync --no-history --revision src/electron@fbc489c43be82f0fc331560ae678a39aeaea38c8`。在 `src/` 生成 `out/Action-Driver`，配置为 `import("//electron/build/args/testing.gn") target_cpu="arm64" mac_sdk_path="/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk" enable_precompiled_headers=false`，实际使用同步的 `buildtools/mac/gn` 生成配置，使用 `third_party/ninja/ninja -C out/Action-Driver -j8 electron` 编译；depot_tools 包装脚本缺少 bootstrap Python 文件，未修改上游脚本。中间文件留在上游规定的位置，导出产物放 `thirdparty/build/`。
 
-构建完成后生成本机 `manifest.json`（本目录 .gitignore 排除；绝对路径和产物校验值属于本机运行记录），记录真实 checkout HEAD、版本、绝对产物路径、GN 参数路径与 SHA-256，并记录 playwright-core 全目录 runtimeSha256、Electron.app 全目录 appSha256 和 appRoot；未构建前不提供虚假的完整 manifest。验证入口为 `node action_driver/baseline/smoke.mjs`。该入口先调用 `verifyManifest`，再启动自有 Electron。截图导出到 `thirdparty/build/verification/`。
+构建完成后生成本机 `manifest.json`（本目录 .gitignore 排除；绝对路径和产物校验值属于本机运行记录），记录真实 checkout HEAD、版本、绝对产物路径、GN 参数路径与 SHA-256，并记录 playwright-core 全目录 runtimeSha256、Electron.app 全目录 appSha256 和 appRoot；未构建前不提供虚假的完整 manifest。验证入口为 `node action-driver/baseline/smoke.mjs`。该入口先调用 `verifyManifest`，再启动自有 Electron。截图导出到 `thirdparty/build/verification/`。
 
 定向测试：
 
 ```sh
-node --test action_driver/baseline/verify.test.mjs
-node --test action_driver/baseline/smoke.test.mjs
+node --test action-driver/baseline/verify.test.mjs
+node --test action-driver/baseline/smoke.test.mjs
 ```
 
 第二条需要真实构建及本机 manifest。测试正常关闭和故意定位失败时的进程、HTTP server 清理；缺失、错误校验值或版本不符均失败。
 
 ## 自有差异规则
 
-Playwright 自有代码只放 `action_driver/`。使用 `git diff 1b025d7e20a026371cd5f98ba0cdce48892737c8 -- . ':!action_driver'` 检查上游路径，并同时检查暂存区与未追踪文件。本期不修改上游行为。
+Playwright 自有代码只放 `action-driver/`。使用 `git diff 1b025d7e20a026371cd5f98ba0cdce48892737c8 -- . ':!action-driver'` 检查上游路径，并同时检查暂存区与未追踪文件。本期不修改上游行为。
 
 Electron 本期没有自有行为补丁。后续 Chromium 行为补丁须由 Electron 补丁队列保存并受 `ACTION_DRIVER` 宏控制；上游已有补丁不属于自有差异。本期宏开关行为验证不适用。
 
@@ -49,7 +49,7 @@ Electron 本期没有自有行为补丁。后续 Chromium 行为补丁须由 Ele
 
 SDK 27 的 math.h 与锁定 Clang/libc++ 组合编译 <random> 时缺少 INFINITY；相同最小例使用现有 SDK 26.5 通过。GN 已显式选择 SDK 26.5，无源码修改或系统默认切换；诊断在 electron-sdk-diagnostic.log。
 
-本次 GN args.gn SHA-256：`4d12bd95411e761fcbf052969e46b67ae872f81776e4a8e9fbb1ad1039f35312`。Chromium 原始提交到补丁后 HEAD 包含 Electron 上游的 144 个补丁提交；本期自有 Chromium 行为补丁为零。已扫描 Playwright 已追踪差异与未追踪文件，自有文件均在 action_driver/。Electron Fork 已追踪差异为零。
+本次 GN args.gn SHA-256：`4d12bd95411e761fcbf052969e46b67ae872f81776e4a8e9fbb1ad1039f35312`。Chromium 原始提交到补丁后 HEAD 包含 Electron 上游的 144 个补丁提交；本期自有 Chromium 行为补丁为零。已扫描 Playwright 已追踪差异与未追踪文件，自有文件均在 action-driver/。Electron Fork 已追踪差异为零。
 
 Xcode 27 缺少独立 Metal Toolchain 导致 ANGLE shader 编译失败。按上游要求执行 `xcodebuild -downloadComponent MetalToolchain -exportPath /Users/jiangtao/coding/action-driver/thirdparty/tools/metal-toolchain`，安装并导出 27A266a；Apple metal 32023.921 可正常调用。Xcode 管理系统资产注册，导出副本位于 tools/metal-toolchain；未改变源码。
 
@@ -65,7 +65,7 @@ Xcode 27 缺少独立 Metal Toolchain 导致 ANGLE shader 编译失败。按上�
 
 ### Blink GC 插件与 PCH
 
-锁定 Clang 版本与源码要求一致（llvmorg-21-init-16348-gbd809ffb-15）。xpath_grammar_generated.o 在加载 PCH 时对 HashTable 内部字段报 blink-gc invalid fields；上游 HashTable 的 GC_PLUGIN_IGNORE_FILE 标记由插件 PragmaHandler 收集，PCH 加载未恢复此状态。同一编译命令仅移除 PCH 后通过，GC 插件仍开启。使用上游 GN 开关 `enable_precompiled_headers = false` 并重新生成 out/ActionDriver，避免该兼容问题；不修改上游源码、不关闭 GC 插件。代价是相关目标重编及编译速度下降。诊断日志为 electron-blink-gc-diagnostic.log、electron-blink-gc-no-pch.log，新 GN 配置生成的目标命令直接执行通过（退出码 0），日志为 electron-blink-gc-no-pch-target-replay.log；Ninja 依赖重编验证 electron-blink-gc-no-pch-target.log 由 Agent 主动停止。全量构建仍待完成。
+锁定 Clang 版本与源码要求一致（llvmorg-21-init-16348-gbd809ffb-15）。xpath_grammar_generated.o 在加载 PCH 时对 HashTable 内部字段报 blink-gc invalid fields；上游 HashTable 的 GC_PLUGIN_IGNORE_FILE 标记由插件 PragmaHandler 收集，PCH 加载未恢复此状态。同一编译命令仅移除 PCH 后通过，GC 插件仍开启。使用上游 GN 开关 `enable_precompiled_headers = false` 并重新生成 out/Action-Driver，避免该兼容问题；不修改上游源码、不关闭 GC 插件。代价是相关目标重编及编译速度下降。诊断日志为 electron-blink-gc-diagnostic.log、electron-blink-gc-no-pch.log，新 GN 配置生成的目标命令直接执行通过（退出码 0），日志为 electron-blink-gc-no-pch-target-replay.log；Ninja 依赖重编验证 electron-blink-gc-no-pch-target.log 由 Agent 主动停止。全量构建仍待完成。
 
 ### Node 配置生成的 GN 查找
 

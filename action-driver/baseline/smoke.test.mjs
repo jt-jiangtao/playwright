@@ -9,7 +9,7 @@ test('runs both locally built Forks through real actions and shutdown', async ()
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
   const result = await api.runSmoke(manifest);
   assert.equal(result.buttonResult, 'clicked');
-  assert.equal(result.inputValue, 'ActionDriver baseline');
+  assert.equal(result.inputValue, 'Action-Driver baseline');
   assert.ok(result.imageSize.width > 0 && result.imageSize.height > 0);
   assert.equal(result.closedPageRejected, true);
   assert.deepEqual(result.cleanup, { electronExited: true, httpClosed: true });

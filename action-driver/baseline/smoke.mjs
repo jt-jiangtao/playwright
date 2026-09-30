@@ -50,9 +50,9 @@ export async function runSmoke(manifest, options = {}) {
     await page.getByRole('button', { name: 'Click baseline' }).click();
     const buttonResult = await page.locator('#result').textContent();
     assert.equal(buttonResult, 'clicked');
-    await page.getByLabel('Baseline input').fill('ActionDriver baseline');
+    await page.getByLabel('Baseline input').fill('Action-Driver baseline');
     const inputValue = await page.getByLabel('Baseline input').inputValue();
-    assert.equal(inputValue, 'ActionDriver baseline');
+    assert.equal(inputValue, 'Action-Driver baseline');
     const screenshot = await page.screenshot({ path: path.join(outputDir, 'baseline.png') });
     const imageSize = await app.evaluate(({ nativeImage }, base64) => {
       const image = nativeImage.createFromBuffer(Buffer.from(base64, 'base64'));
